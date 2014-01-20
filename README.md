@@ -82,6 +82,8 @@ And query it:
 
     echo count( D2EM::getRepository( 'Entities\SampleEntity' )->findAll() );
 
+I use the excellent [ORM Designer](http://www.orm-designer.com/) to create and manage my XML schema files.
+
 ## Convenience Function for Repositories
 
 If, like me, you spend a lot of time typing `D2EM::getRepository( 'Entities\XXX' )`, then add the following to the end of `bootstrap/start.php`:
