@@ -88,7 +88,7 @@ I use the excellent [ORM Designer](http://www.orm-designer.com/) to create and m
 
 If, like me, you spend a lot of time typing `D2EM::getRepository( 'Entities\XXX' )`, then add the following to the end of `bootstrap/start.php`:
 
-    include $app['path.base'] . '/vendor/opensolutions/doctrine2-bridge/src/bootstrap/d2r.php'
+    include $app['path.base'] . '/vendor/opensolutions/doctrine2bridge/src/bootstrap/d2r.php';
 
 and then you can replace the above with: `D2R( 'XXX' )`. I use *Entities* as my namespace generally so this function is just as follows (which you can easily change to suit yourself):
 
