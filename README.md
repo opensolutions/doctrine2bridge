@@ -12,9 +12,15 @@ Metadata is currently obtained via the [XML driver](http://docs.doctrine-project
 
 Installation is the usual for Laravel packages.
 
-Insert the following in the packages section of your composer.json file and run an update:
+Insert the following in the packages (`require`) section of your composer.json file and run an update (`composer update`):
 
     "opensolutions/doctrine2bridge": "2.4.*",
+
+Generally speaking, we'll try and match our minor versions (2.4.x) with Doctrine's.
+
+Note that your minimum stability must be `dev` for Doctrine migrations. If the above command complains, ensure you have the following set in your `composer.json` file:
+
+    "minimum-stability": "dev"
 
 Add the service providers to your Laravel application in `app/config/app.php`. In the `'providers'` array add:
 
@@ -30,6 +36,64 @@ This should get you a fresh copy of the configuration file in the directory `app
     config/packages/vendor/opensolutions/doctrine2bridge
 
 ## Usage
+
+Two facades are provided - one for the Doctrine2 cache and the other for the entity manager. These can be used as follows:
+
+    D2Cache::save( $key, $value );
+    D2Cache::fetch( $key );
+    
+    D2EM::persist( $object );
+    D2EM::flush();
+    $users = D2EM::getRepository( 'Entities\User' )->findAll();
+
+## More Detailed Usage
+
+The configuration file by default expects to find XML schema definitions under `doctrine/schema`. Let's say for example we have a single schema file called `doctrine/schema/Entities.SampleEntity.dcm.xml` containing:
+
+    <?xml version="1.0"?>
+    <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xsi="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+        <entity name="Entities\SampleEntity" repository-class="Repositories\Sample">
+            <id name="id" type="integer">
+                <generator strategy="AUTO"/>
+            </id>
+            <field name="name" type="string" length="255" nullable="true"/>
+        </entity>
+    </doctrine-mapping>
+
+Assuming you've configured your database connection parameters in the config file and you're positioning in the base directory of your project, we can create the entities, proxies and repositories with:
+
+    ./vendor/bin/doctrine2 orm:generate-entities app/models/
+    ./vendor/bin/doctrine2 orm:generate-proxies
+    ./vendor/bin/doctrine2 orm:generate-repositories app/models/
+
+You can also (drop) and create the database with:
+
+    ./vendor/bin/doctrine2 orm:schema-tool:drop --force
+    ./vendor/bin/doctrine2 orm:schema-tool:create
+
+Now you can add some data to the database:
+
+    $se = new Entities\SampleEntity;
+    $se->setName( rand( 0, 100 ) );
+    D2EM::persist( $se );
+    D2EM::flush();
+
+And query it:
+
+    echo count( D2EM::getRepository( 'Entities\SampleEntity' )->findAll() );
+
+## Convenience Function for Repositories
+
+If, like me, you spend a lot of time typing `D2EM::getRepository( 'Entities\XXX' )`, then add the following to the end of `bootstrap/start.php`:
+
+    include $app['path.base'] . '/vendor/opensolutions/doctrine2-bridge/src/bootstrap/d2r.php'
+
+and then you can replace the above with: `D2R( 'XXX' )`. I use *Entities* as my namespace generally so this function is just as follows (which you can easily change to suit yourself):
+
+    function D2R( $entity, $namespace = 'Entities' )
+    {
+        return D2EM::getRepository( $namespace . '\\' . $entity );
+    }
 
 ## License
 
