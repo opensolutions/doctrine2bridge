@@ -1,5 +1,5 @@
 {
-    "name": "opensolutions/doctrine2-bridge",
+    "name": "opensolutions/doctrine2bridge",
     "description": "https://github.com/opensolutions/doctrine2bridge",
     "keywords": [ "laravel", "doctrine", "doctrine2" ],
     "license": "MIT",
