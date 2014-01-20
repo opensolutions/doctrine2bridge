@@ -1,0 +1,33 @@
+{
+    "name": "opensolutions/doctrine2-bridge",
+    "description": "https://github.com/opensolutions/doctrine2bridge",
+    "keywords": [ "laravel", "doctrine", "doctrine2" ],
+    "license": "MIT",
+    "homepage:": "",
+    "authors": [
+        {
+            "name":     "Barry O'Donovan",
+            "email":    "barry@opensolutions.ie",
+            "homepage": "http://www.barryodonovan.com/",
+            "role":     "Developer"
+        }
+    ],
+    "support": [
+        {
+            "issues": "https://github.com/opensolutions/doctrine2bridge/issues",
+            "source": "https://github.com/opensolutions/doctrine2bridge"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "doctrine/orm": "2.4.*",
+        "doctrine/migrations": "1.0.*@dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "Doctrine2Bridge": "src/"
+        }
+    },
+    "bin": [ "bin/doctrine2" ],
+    "minimum-stability": "dev"
+}

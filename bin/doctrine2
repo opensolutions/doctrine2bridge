@@ -1,0 +1,69 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Doctrine2 Bridge - Brings Doctrine2 to Laravel 4.
+ *
+ * @author Barry O'Donovan <barry@opensolutions.ie>
+ * @copyright Copyright (c) 2014 Open Source Solutions Limited
+ * @license MIT
+ */
+
+
+mb_internal_encoding('UTF-8');
+mb_language('uni');
+
+use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\HelperSet;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
+
+require __DIR__.'/../../../../bootstrap/autoload.php';
+$app = require_once __DIR__.'/../../../../bootstrap/start.php';
+$app->boot();
+
+$d2cache = App::make('d2cachebridge');
+$d2em    = App::make('d2embridge');
+
+$helperSet = new HelperSet( array(
+        'db'     => new ConnectionHelper( $d2em->getConnection() ),
+        'em'     => new EntityManagerHelper( $d2em ),
+        'dialog' => new DialogHelper(),
+));
+
+$cli = new \Symfony\Component\Console\Application( 'Doctrine Command Line Interface', Doctrine\Common\Version::VERSION );
+$cli->setCatchExceptions(true);
+
+// from http://docs.doctrine-project.org/projects/doctrine-migrations/en/latest/reference/introduction.html
+$cli->addCommands( array(
+    // Migrations Commands
+    new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
+    new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
+    new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
+    new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
+    new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
+    new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
+));
+
+Doctrine\ORM\Tools\Console\ConsoleRunner::addCommands( $cli );
+
+$helpers = $cli->getHelperSet();
+foreach ($helperSet as $name => $helper) {
+    $helpers->set($helper, $name);
+}
+
+if( Config::get( 'doctrine2bridge::cache.flushForCli' ) == true )
+    D2Cache::flushAll();
+
+$cli->run();
+
+
