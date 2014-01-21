@@ -50,6 +50,16 @@ return array(
 
     'doctrine' => array(
 
+        // connection parameters
+        'connection' => array(
+            'driver'   => 'pdo_mysql',
+            'dbname'   => 'test',
+            'user'     => 'test',
+            'password' => '',
+            'host'     => '127.0.0.1',
+            'charset'  => 'utf8'
+        ),
+
         // Paths for models, proxies, repositories, etc.
         'paths' => array(
             'models'       => app_path()  . '/models',          // '/Entities' added by default
@@ -68,14 +78,12 @@ return array(
             'repositories' => 'Repositories'
         ),
 
-        // connection parameters
-        'connection' => array(
-            'driver'   => 'pdo_mysql',
-            'dbname'   => 'test',
-            'user'     => 'test',
-            'password' => '',
-            'host'     => '127.0.0.1',
-            'charset'  => 'utf8'
-        )
+        // Doctrine2Bridge includes an implementation of Doctrine\DBAL\Logging\SQLLogger which
+        // just calls the Laravel Log facade. If you wish to log your SQL queries (and execution 
+        // time), just set enabled in the following to true.
+        'sqllogger' => array(
+            'enabled' => false,
+            'level'   => 'debug'   // one of debug, info, notice, warning, error, critical, alert
+        ),
     )
 );

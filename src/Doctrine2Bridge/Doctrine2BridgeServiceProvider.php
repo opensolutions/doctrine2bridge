@@ -67,6 +67,15 @@ class Doctrine2BridgeServiceProvider extends ServiceProvider {
             $dconfig->setProxyDir(                 $config['paths']['proxies']      );
             $dconfig->setProxyNamespace(           $config['namespaces']['proxies'] );
             $dconfig->setAutoGenerateProxyClasses( $config['autogen_proxies']       );
+            
+            if( isset( $config['sqllogger']['enabled'] ) && $config['sqllogger']['enabled'] )
+            {
+                $logger = new Logger\Laravel;
+                if( isset( $config['sqllogger']['level'] ) )
+                    $logger->setLevel( $config['sqllogger']['level'] );
+                    
+                $dconfig->setSQLLogger( $logger );
+            }
 
             return \Doctrine\ORM\EntityManager::create( $config['connection'], $dconfig );
         });

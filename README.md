@@ -97,6 +97,12 @@ and then you can replace the above with: `D2R( 'XXX' )`. I use *Entities* as my 
         return D2EM::getRepository( $namespace . '\\' . $entity );
     }
 
+## SQL Query Logging
+
+This package includes an implementation of `Doctrine\DBAL\Logging\SQLLlogger` which times the queries and calls the Laravel [Log](http://laravel.com/docs/errors#logging) facade to log the query execution times and the SQL queries.
+
+This logger can be enabled in the configuration file.
+
 ## License
 
 Like the Laravel framework itself, this project is open-sourced under the [MIT license](http://opensource.org/licenses/MIT).
