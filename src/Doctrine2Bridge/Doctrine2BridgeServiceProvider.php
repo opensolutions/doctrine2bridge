@@ -28,6 +28,11 @@ class Doctrine2BridgeServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = false;
 
+    /**
+     * Configuration from file
+     */
+    protected $d2config = null;
+
 	/**
 	 * Register the service provider.
 	 *
@@ -37,6 +42,33 @@ class Doctrine2BridgeServiceProvider extends ServiceProvider {
 	{
 		$this->package( 'opensolutions/doctrine2bridge', 'doctrine2bridge' );
 		$this->app['config']->package('opensolutions/doctrine2bridge', __DIR__.'/../config');
+
+        $this->app->singleton( 'd2embridge', function ($app) {
+
+            $this->d2config = \Config::get('doctrine2bridge::doctrine');
+
+            $dconfig = new \Doctrine\ORM\Configuration;
+
+
+            $driver = new \Doctrine\ORM\Mapping\Driver\XmlDriver(
+                [ $this->d2config['paths']['xml_schema'] ]
+            );
+
+            $dconfig->setMetadataDriverImpl( $driver );
+
+            $dconfig->setProxyDir(                 $this->d2config['paths']['proxies']      );
+            $dconfig->setProxyNamespace(           $this->d2config['namespaces']['proxies'] );
+            $dconfig->setAutoGenerateProxyClasses( $this->d2config['autogen_proxies']       );
+            
+            return \Doctrine\ORM\EntityManager::create( $this->d2config['connection'], $dconfig );
+        });
+
+        // Shortcut so developers don't need to add an Alias in app/config/app.php
+        \App::booting( function()
+        {
+            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+            $loader->alias( 'D2EM', 'Doctrine2Bridge\Support\Facades\Doctrine2' );
+        });
 	}
 
 	/**
@@ -46,46 +78,21 @@ class Doctrine2BridgeServiceProvider extends ServiceProvider {
      */
     public function boot() 
     {
-        $this->app->singleton( 'd2embridge', function ($app) {
+        $d2em = $this->app['d2embridge'];
 
-            $config = \Config::get('doctrine2bridge::doctrine');
+        $d2cache = $this->app['d2cachebridge'];
+        $d2em->getConfiguration()->setMetadataCacheImpl( $d2cache );
+        $d2em->getConfiguration()->setQueryCacheImpl( $d2cache );
+        $d2em->getConnection()->getConfiguration()->setResultCacheImpl( $d2cache );
 
-            $d2cache = $this->app['d2cachebridge'];
-
-            $dconfig = new \Doctrine\ORM\Configuration;
-
-            $dconfig->setMetadataCacheImpl( $d2cache );
-
-            $driver = new \Doctrine\ORM\Mapping\Driver\XmlDriver(
-                [ $config['paths']['xml_schema'] ]
-            );
-
-            $dconfig->setMetadataDriverImpl( $driver );
-
-            $dconfig->setQueryCacheImpl(           $d2cache                         );
-            $dconfig->setResultCacheImpl(          $d2cache                         );
-            $dconfig->setProxyDir(                 $config['paths']['proxies']      );
-            $dconfig->setProxyNamespace(           $config['namespaces']['proxies'] );
-            $dconfig->setAutoGenerateProxyClasses( $config['autogen_proxies']       );
-            
-            if( isset( $config['sqllogger']['enabled'] ) && $config['sqllogger']['enabled'] )
-            {
-                $logger = new Logger\Laravel;
-                if( isset( $config['sqllogger']['level'] ) )
-                    $logger->setLevel( $config['sqllogger']['level'] );
-                    
-                $dconfig->setSQLLogger( $logger );
-            }
-
-            return \Doctrine\ORM\EntityManager::create( $config['connection'], $dconfig );
-        });
-
-        // Shortcut so developers don't need to add an Alias in app/config/app.php
-        \App::booting( function()
+        if( isset( $this->d2config['sqllogger']['enabled'] ) && $this->d2config['sqllogger']['enabled'] )
         {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-            $loader->alias( 'D2EM', 'Doctrine2Bridge\Support\Facades\Doctrine2' );
-        });
+            $logger = new Logger\Laravel;
+            if( isset( $this->d2config['sqllogger']['level'] ) )
+                $logger->setLevel( $this->d2config['sqllogger']['level'] );
+                
+            $d2em->getConnection()->getConfiguration()->setSQLLogger( $logger );
+        }
     }
 
 	/**
