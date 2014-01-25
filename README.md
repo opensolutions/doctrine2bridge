@@ -10,7 +10,7 @@ Metadata is currently obtained via the [XML driver](http://docs.doctrine-project
 
 ## Installation
 
-Installation is the usual for Laravel packages.
+Installation is the usual for Laravel packages. You can find a detailed worked version of [how to install and test in the wiki](https://github.com/opensolutions/doctrine2bridge/wiki/Install-from-Scratch).
 
 Insert the following in the packages (`require`) section of your composer.json file and run an update (`composer update`):
 
