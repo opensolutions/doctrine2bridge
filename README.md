@@ -1,12 +1,14 @@
 # Doctrine2Bridge
 
-Adds the power of Doctrine2 to Laraval 4.
+Adds the power of Doctrine2 to Laraval 4 (including authentication and SQL query logging support).
 
 Laravel's Eloquent ORM is nice for lightweight use, however there's little out there that can beat Doctrine when you need a more full-featured ORM.
 
 This is an integration of Doctrine 2.x to Laravel 4.x as a composer package. Doctrine's EntityManager instance is accessible through a facade named `D2EM` and the cache is directly available via `D2Cache`.
 
 Metadata is currently obtained via the [XML driver](http://docs.doctrine-project.org/en/latest/reference/xml-mapping.html). It should be easy to add additional drivers to this.
+
+Authentication support is also included via a `Auth/Doctrine2UserProvider` class. Documentation on integrating this with Laravel's own authentication system [can be found here](https://github.com/opensolutions/doctrine2bridge/wiki/Auth).
 
 ## Installation
 
@@ -16,7 +18,7 @@ Insert the following in the packages (`require`) section of your composer.json f
 
     "opensolutions/doctrine2bridge": "2.4.*",
 
-Generally speaking, we'll try and match our minor versions (2.4.x) with Doctrine's.
+Generally speaking, we'll try and match our minor versions (2.4.x) with Doctrine's but you should always use the latest `x` version of this.
 
 Note that your minimum stability must be `dev` for Doctrine migrations. If the above command complains, ensure you have the following set in your `composer.json` file:
 
@@ -34,6 +36,8 @@ You'll need to public and edit the configuration file:
 This should get you a fresh copy of the configuration file in the directory `app`:
 
     config/packages/vendor/opensolutions/doctrine2bridge
+
+Documentation on integrating this with Laravel's own authentication system [can be found here](https://github.com/opensolutions/doctrine2bridge/wiki/Auth).
 
 ## Usage
 
