@@ -11,15 +11,7 @@
 
 namespace Doctrine2Bridge;
 
-use Illuminate\Support\ServiceProvider;
-
-//use Doctrine\Common\EventManager;
-//use Doctrine\ORM\Tools\Setup;
-//use Doctrine\ORM\Events;
-//use Doctrine\ORM\EntityManager;
-//use Doctrine\ORM\Configuration;
-
-class Doctrine2BridgeServiceProvider extends ServiceProvider {
+class Doctrine2BridgeServiceProvider extends \Illuminate\Support\ServiceProvider {
 
 	/**
 	 * Indicates if loading of the provider is deferred.
@@ -92,6 +84,20 @@ class Doctrine2BridgeServiceProvider extends ServiceProvider {
                 $logger->setLevel( $this->d2config['sqllogger']['level'] );
                 
             $d2em->getConnection()->getConfiguration()->setSQLLogger( $logger );
+        }
+
+        if( isset( $this->d2config['auth']['enabled'] ) && $this->d2config['auth']['enabled'] )
+        {
+            \Auth::extend( 'doctrine2bridge', function()
+            {
+                return new \Illuminate\Auth\Guard(
+                    new Auth\Doctrine2UserProvider(
+                        \D2EM::getRepository( $this->d2config['auth']['entity'] ),
+                        new \Illuminate\Hashing\BcryptHasher
+                    ),
+                    \App::make('session.store')
+                );
+            });
         }
     }
 

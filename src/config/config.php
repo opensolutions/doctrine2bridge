@@ -85,5 +85,12 @@ return array(
             'enabled' => false,
             'level'   => 'debug'   // one of debug, info, notice, warning, error, critical, alert
         ),
+        
+        // use Doctrine2bridge with Laravel's authentication menchanism
+        // see: https://github.com/opensolutions/doctrine2bridge/wiki/Auth
+        'auth' => array(
+            'enabled' => false,
+            'entity'  => '\Entities\User'   // the Doctrine2 entity representing the user
+        )
     )
 );
