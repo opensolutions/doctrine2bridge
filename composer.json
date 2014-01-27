@@ -1,9 +1,9 @@
 {
     "name": "opensolutions/doctrine2bridge",
-    "description": "https://github.com/opensolutions/doctrine2bridge",
+    "description": "Adds the the power of Doctrine2 to Laravel 4 (with support for SQL logging and authentication)",
+    "homepage": "https://github.com/opensolutions/doctrine2bridge",
     "keywords": [ "laravel", "doctrine", "doctrine2" ],
     "license": "MIT",
-    "homepage:": "",
     "authors": [
         {
             "name":     "Barry O'Donovan",
