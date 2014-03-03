@@ -12,12 +12,10 @@
             "role":     "Developer"
         }
     ],
-    "support": [
-        {
-            "issues": "https://github.com/opensolutions/doctrine2bridge/issues",
-            "source": "https://github.com/opensolutions/doctrine2bridge"
-        }
-    ],
+    "support": {
+        "issues": "https://github.com/opensolutions/doctrine2bridge/issues",
+        "source": "https://github.com/opensolutions/doctrine2bridge"
+    },
     "require": {
         "php": ">=5.3.0",
         "doctrine/orm": "2.*",
