@@ -35,24 +35,24 @@ class Doctrine2BridgeServiceProvider extends \Illuminate\Support\ServiceProvider
 		$this->package( 'opensolutions/doctrine2bridge', 'doctrine2bridge' );
 		$this->app['config']->package('opensolutions/doctrine2bridge', __DIR__.'/../config');
 
-        $this->app->singleton( 'd2embridge', function ($app) {
+        $d2config = $this->d2config = \Config::get('doctrine2bridge::doctrine');
 
-            $this->d2config = \Config::get('doctrine2bridge::doctrine');
+        $this->app->singleton( 'd2embridge', function ($app) use($d2config) {
 
             $dconfig = new \Doctrine\ORM\Configuration;
 
 
             $driver = new \Doctrine\ORM\Mapping\Driver\XmlDriver(
-                [ $this->d2config['paths']['xml_schema'] ]
+                array( $d2config['paths']['xml_schema'] )
             );
 
             $dconfig->setMetadataDriverImpl( $driver );
 
-            $dconfig->setProxyDir(                 $this->d2config['paths']['proxies']      );
-            $dconfig->setProxyNamespace(           $this->d2config['namespaces']['proxies'] );
-            $dconfig->setAutoGenerateProxyClasses( $this->d2config['autogen_proxies']       );
-            
-            return \Doctrine\ORM\EntityManager::create( $this->d2config['connection'], $dconfig );
+            $dconfig->setProxyDir(                 $d2config['paths']['proxies']      );
+            $dconfig->setProxyNamespace(           $d2config['namespaces']['proxies'] );
+            $dconfig->setAutoGenerateProxyClasses( $d2config['autogen_proxies']       );
+
+            return \Doctrine\ORM\EntityManager::create( $d2config['connection'], $dconfig );
         });
 
         // Shortcut so developers don't need to add an Alias in app/config/app.php
@@ -68,7 +68,7 @@ class Doctrine2BridgeServiceProvider extends \Illuminate\Support\ServiceProvider
      *
      * @return void
      */
-    public function boot() 
+    public function boot()
     {
         $d2em = $this->app['d2embridge'];
 
@@ -82,7 +82,7 @@ class Doctrine2BridgeServiceProvider extends \Illuminate\Support\ServiceProvider
             $logger = new Logger\Laravel;
             if( isset( $this->d2config['sqllogger']['level'] ) )
                 $logger->setLevel( $this->d2config['sqllogger']['level'] );
-                
+
             $d2em->getConnection()->getConfiguration()->setSQLLogger( $logger );
         }
 
