@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Doctrine2 Bridge - Brings Doctrine2 to Laravel 4.
@@ -15,7 +15,7 @@ use Illuminate\Hashing\HasherInterface;
 /**
  * Class to provide a Doctrine2 user object for Laravel authentication.
  */
-class Doctrine2UserProvider implements \Illuminate\Auth\UserProviderInterface 
+class Doctrine2UserProvider implements \Illuminate\Auth\UserProviderInterface
 {
 	/**
 	 * The hasher implementation.
@@ -106,5 +106,46 @@ class Doctrine2UserProvider implements \Illuminate\Auth\UserProviderInterface
 
 		return $this->hasher->check( $plain, $user->getAuthPassword() );
 	}
+
+
+    /**
+     * Retrieve a user by their unique "remember me" token.
+     *
+     * @param mixed $identifier
+     * @param string $token
+     * @return \Illuminate\Auth\UserInterface|null
+     */
+    public function retrieveByToken( $identifier, $token )
+    {
+        try {
+            return $this->d2repository
+                ->createQueryBuilder( 'u' )
+                ->setMaxResults( 1 )
+                ->select( 'u' )
+                ->andWhere( 'u.id = :id' )->setParameter( 'id', $identifier )
+                ->andWhere( 'u.remember_token = :token' )->setParameter( 'token', $token )
+                ->getQuery()
+                ->getSingleResult();
+        }
+        catch( \Doctrine\ORM\NoResultException $e ) {
+            return null;
+        }
+    }
+
+
+    /**
+     * Updates the "remember me" token for the given user in storage.
+     *
+     * @param \Illuminate\Auth\UserInterface $user
+     * @param string $token
+     * @return void
+     */
+    public function updateRememberToken( \Illuminate\Auth\UserInterface $user, $token )
+    {
+
+        $user->setRememberToken( $token );
+        $this->d2repository->createQueryBuilder()->getEntityManager()->flush();
+    }
+
 
 }
